@@ -1,0 +1,32 @@
+[package]
+authors = ["Ioan Herisanu <ioan.herisanu.dev@gmail.com>"]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "An embedded-hal based driver for ePaper displays from Waveshare that use UART. Only 4.3 is supported"
+documentation = "https://docs.rs/epd-waveshare-uart"
+homepage = "https://github.com/iohe/epd-waveshare-uart"
+keywords = ["ePaper", "Display", "epd", "eink"]
+license = "ISC"
+name = "epd-waveshare-uart"
+readme = "README.md"
+repository = "https://github.com/iohe/epd-waveshare-uart.git"
+version = "0.1.0"
+edition = "2018"
+
+[features]
+default = ["epd4in3", "graphics"]
+
+graphics = ["embedded-graphics"]
+epd4in3 = []
+
+[dependencies]
+arrayvec = "0.5.1"
+encoding_rs = "0.8.20"
+
+[dependencies.embedded-graphics]
+optional = true
+version = "0.5.2"
+
+[dependencies.embedded-hal]
+#features = ["unproven"]
+version = "0.2.1"
+
