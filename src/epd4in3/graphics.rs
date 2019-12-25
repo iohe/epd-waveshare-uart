@@ -6,37 +6,36 @@ use embedded_graphics::prelude::*;
 /// Full size buffer for use with the 4in3 EPD
 ///
 /// Can also be manuall constructed:
-/// `buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value(); WIDTH / 4 * HEIGHT]`
+/// `buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value(); WIDTH / 8 * HEIGHT]`
 pub struct Display4in3 {
-    buffer: [u8; WIDTH as usize * HEIGHT as usize / 4],
+    buffer: [EpdColor; WIDTH as usize * HEIGHT as usize],
     rotation: DisplayRotation,
 }
 
 impl Default for Display4in3 {
     fn default() -> Self {
         Display4in3 {
-            buffer: [DEFAULT_BACKGROUND_COLOR.get_byte_value();
-                WIDTH as usize * HEIGHT as usize / 4],
+            buffer: [DEFAULT_BACKGROUND_COLOR; WIDTH as usize * HEIGHT as usize],
             rotation: DisplayRotation::default(),
         }
     }
 }
 
-impl Drawing<Color> for Display4in3 {
+impl Drawing<EpdColor> for Display4in3 {
     fn draw<T>(&mut self, item_pixels: T)
     where
-        T: IntoIterator<Item = Pixel<Color>>,
+        T: IntoIterator<Item = Pixel<EpdColor>>,
     {
         self.draw_helper(WIDTH, HEIGHT, item_pixels);
     }
 }
 
 impl Display for Display4in3 {
-    fn buffer(&self) -> &[u8] {
+    fn buffer(&self) -> &[EpdColor] {
         &self.buffer
     }
 
-    fn get_mut_buffer(&mut self) -> &mut [u8] {
+    fn get_mut_buffer(&mut self) -> &mut [EpdColor] {
         &mut self.buffer
     }
 
@@ -52,17 +51,17 @@ impl Display for Display4in3 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::color::Color;
+    use crate::color::EpdColor;
     use crate::epd4in3;
     use crate::graphics::{Display, DisplayRotation};
-    use embedded_graphics::coord::Coord;
+    use embedded_graphics::geometry::Point;
     use embedded_graphics::primitives::Line;
 
     // test buffer length
     #[test]
     fn graphics_size() {
         let display = Display4in3::default();
-        assert_eq!(display.buffer().len(), 120000);
+        assert_eq!(display.buffer().len(), 480000);
     }
 
     // test default background color on all bytes
@@ -70,7 +69,7 @@ mod tests {
     fn graphics_default() {
         let display = Display4in3::default();
         for &byte in display.buffer() {
-            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR.get_byte_value());
+            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR);
         }
     }
 
@@ -78,36 +77,17 @@ mod tests {
     fn graphics_rotation_0() {
         let mut display = Display4in3::default();
         display.draw(
-            Line::new(Coord::new(0, 0), Coord::new(7, 0))
-                .stroke(Some(Color::Black))
+            Line::new(Point::new(0, 0), Point::new(7, 0))
+                .stroke(Some(EpdColor::Black))
                 .into_iter(),
         );
 
         let buffer = display.buffer();
 
-        assert_eq!(buffer[0], Color::Black.get_byte_value());
+        assert_eq!(buffer[0], EpdColor::Black);
 
-        for &byte in buffer.iter().skip(1) {
-            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR.get_byte_value());
-        }
-    }
-
-    #[test]
-    fn graphics_rotation_90() {
-        let mut display = Display4in3::default();
-        display.set_rotation(DisplayRotation::Rotate90);
-        display.draw(
-            Line::new(Coord::new(0, 592), Coord::new(0, 599))
-                .stroke(Some(Color::Black))
-                .into_iter(),
-        );
-
-        let buffer = display.buffer();
-
-        assert_eq!(buffer[0], Color::Black.get_byte_value());
-
-        for &byte in buffer.iter().skip(1) {
-            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR.get_byte_value());
+        for &byte in buffer.iter().skip(8) {
+            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR);
         }
     }
 
@@ -116,42 +96,20 @@ mod tests {
         let mut display = Display4in3::default();
         display.set_rotation(DisplayRotation::Rotate180);
         display.draw(
-            Line::new(Coord::new(792, 599), Coord::new(799, 599))
-                .stroke(Some(Color::Black))
+            Line::new(Point::new(792, 599), Point::new(799, 599))
+                .stroke(Some(EpdColor::Black))
                 .into_iter(),
         );
 
         let buffer = display.buffer();
 
-        extern crate std;
-        std::println!("{:?}", buffer);
+        //extern crate std;
+        //std::println!("{:?}", buffer);
 
-        assert_eq!(buffer[0], Color::Black.get_byte_value());
+        assert_eq!(buffer[0], EpdColor::Black);
 
-        for &byte in buffer.iter().skip(1) {
-            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR.get_byte_value());
-        }
-    }
-
-    #[test]
-    fn graphics_rotation_270() {
-        let mut display = Display4in3::default();
-        display.set_rotation(DisplayRotation::Rotate270);
-        display.draw(
-            Line::new(Coord::new(599, 0), Coord::new(599, 7))
-                .stroke(Some(Color::Black))
-                .into_iter(),
-        );
-
-        let buffer = display.buffer();
-
-        extern crate std;
-        std::println!("{:?}", buffer);
-
-        assert_eq!(buffer[0], Color::Black.get_byte_value());
-
-        for &byte in buffer.iter().skip(1) {
-            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR.get_byte_value());
+        for &byte in buffer.iter().skip(8) {
+            assert_eq!(byte, epd4in3::DEFAULT_BACKGROUND_COLOR);
         }
     }
 }

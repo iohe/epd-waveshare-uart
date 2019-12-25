@@ -24,7 +24,7 @@ encoding_rs = "0.8.20"
 
 [dependencies.embedded-graphics]
 optional = true
-version = "0.5.2"
+version = "0.6.0-alpha.2"
 
 [dependencies.embedded-hal]
 #features = ["unproven"]

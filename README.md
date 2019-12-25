@@ -21,9 +21,9 @@ let mut display = Display::new(epd.width(), epd.height(), &mut buffer.buffer);
 // Draw some text
 display.draw(
     Font12x16::render_str("Hello Rust!")
-        .stroke(Some(Color::Black))
-        .fill(Some(Color::White))
-        .translate(Coord::new(5, 50))
+        .stroke(Some(EpdColor::Black))
+        .fill(Some(EpdColor::White))
+        .translate(Point::new(5, 50))
         .into_iter(),
 );
 

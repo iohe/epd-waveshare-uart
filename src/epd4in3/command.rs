@@ -1,4 +1,4 @@
-use crate::color::Color;
+use crate::color::EpdColor;
 use crate::traits;
 use arrayvec::ArrayVec;
 use encoding_rs::*;
@@ -267,7 +267,7 @@ pub fn set_font_size_zh(fontsize: Fontsize) -> Option<Frame> {
     build_frame(Command::SetFontSizeZh, &array)
 }
 
-pub fn set_color(foreground: Color, background: Color) -> Option<Frame> {
+pub fn set_color(foreground: EpdColor, background: EpdColor) -> Option<Frame> {
     let mut array = ArrayVec::<[_; 1024]>::new();
     array.push(foreground as u8);
     array.push(background as u8);
@@ -493,7 +493,7 @@ mod tests {
 
     #[test]
     fn set_color_works() {
-        let frame = set_color(Color::Black, Color::White).unwrap();
+        let frame = set_color(EpdColor::Black, EpdColor::White).unwrap();
         assert_eq!(
             frame.bytes[0..(frame.len as usize)],
             [0xA5, 0x00, 0x0B, 0x10, 0x00, 0x03, 0xCC, 0x33, 0xC3, 0x3C, 0xBD]

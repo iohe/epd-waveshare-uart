@@ -1,42 +1,42 @@
 //! B/W/G/DG Color for EPDs
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum Color {
+pub enum EpdColor {
     Black = 0,
     DarkGray = 1,
     Gray = 2,
     White = 3,
 }
 
-impl Color {
+impl EpdColor {
     /// Get the color encoding of the color for one bit
     pub fn get_bit_value(self) -> u8 {
         match self {
-            Color::White => 3u8,
-            Color::Black => 0u8,
-            Color::DarkGray => 1u8,
-            Color::Gray => 2u8,
+            EpdColor::White => 3u8,
+            EpdColor::Black => 0u8,
+            EpdColor::DarkGray => 1u8,
+            EpdColor::Gray => 2u8,
         }
     }
 
     /// Gets a full byte of black or white pixels
     pub fn get_byte_value(self) -> u8 {
         match self {
-            Color::White => 0xff,
-            Color::Black => 0x00,
-            Color::DarkGray => 0x55,
-            Color::Gray => 0xaa,
+            EpdColor::White => 0xff,
+            EpdColor::Black => 0x00,
+            EpdColor::DarkGray => 0x55,
+            EpdColor::Gray => 0xaa,
         }
     }
 
     /// Parses from u8 to Color
     fn from_u8(val: u8) -> Self {
         match val {
-            0 => Color::Black,
-            1 => Color::DarkGray,
-            2 => Color::Gray,
-            3 => Color::White,
+            0 => EpdColor::Black,
+            1 => EpdColor::DarkGray,
+            2 => EpdColor::Gray,
+            3 => EpdColor::White,
             e => panic!(
                 "DisplayColor only parses 0 and 3 (Black and White) and not `{}`",
                 e
@@ -47,24 +47,26 @@ impl Color {
     /// Returns the inverse of the given color.
     ///
     /// Black returns White and White returns Black
-    pub fn inverse(self) -> Color {
+    pub fn inverse(self) -> EpdColor {
         match self {
-            Color::White => Color::Black,
-            Color::Black => Color::White,
-            Color::Gray => Color::DarkGray,
-            Color::DarkGray => Color::Gray,
+            EpdColor::White => EpdColor::Black,
+            EpdColor::Black => EpdColor::White,
+            EpdColor::Gray => EpdColor::DarkGray,
+            EpdColor::DarkGray => EpdColor::Gray,
         }
     }
 }
 
 #[cfg(feature = "graphics")]
-use embedded_graphics::prelude::*;
+use embedded_graphics::prelude::PixelColor;
 #[cfg(feature = "graphics")]
-impl PixelColor for Color {}
+impl PixelColor for EpdColor {
+    type Raw = ();
+}
 
-impl From<u8> for Color {
+impl From<u8> for EpdColor {
     fn from(value: u8) -> Self {
-        Color::from_u8(value)
+        EpdColor::from_u8(value)
     }
 }
 
@@ -74,10 +76,10 @@ mod tests {
 
     #[test]
     fn from_u8() {
-        assert_eq!(Color::Black, Color::from(0u8));
-        assert_eq!(Color::White, Color::from(3u8));
-        assert_eq!(Color::Gray, Color::from(2u8));
-        assert_eq!(Color::DarkGray, Color::from(1u8));
+        assert_eq!(EpdColor::Black, EpdColor::from(0u8));
+        assert_eq!(EpdColor::White, EpdColor::from(3u8));
+        assert_eq!(EpdColor::Gray, EpdColor::from(2u8));
+        assert_eq!(EpdColor::DarkGray, EpdColor::from(1u8));
     }
 
     // test all values aside from 0,1,2 and 3 which all should panic
@@ -85,20 +87,26 @@ mod tests {
     fn from_u8_panic() {
         for val in 4..=u8::max_value() {
             extern crate std;
-            let result = std::panic::catch_unwind(|| Color::from(val));
+            let result = std::panic::catch_unwind(|| EpdColor::from(val));
             assert!(result.is_err());
         }
     }
 
     #[test]
     fn u8_conversion_black() {
-        assert_eq!(Color::from(Color::Black.get_bit_value()), Color::Black);
-        assert_eq!(Color::from(0u8).get_bit_value(), 0u8);
+        assert_eq!(
+            EpdColor::from(EpdColor::Black.get_bit_value()),
+            EpdColor::Black
+        );
+        assert_eq!(EpdColor::from(0u8).get_bit_value(), 0u8);
     }
 
     #[test]
     fn u8_conversion_white() {
-        assert_eq!(Color::from(Color::White.get_bit_value()), Color::White);
-        assert_eq!(Color::from(3u8).get_bit_value(), 3u8);
+        assert_eq!(
+            EpdColor::from(EpdColor::White.get_bit_value()),
+            EpdColor::White
+        );
+        assert_eq!(EpdColor::from(3u8).get_bit_value(), 3u8);
     }
 }

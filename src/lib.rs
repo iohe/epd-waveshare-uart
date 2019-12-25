@@ -19,7 +19,7 @@
 //! # Examples
 //!
 //! ```rust,ignore
-//! use epd_waveshare::{
+//! use epd_waveshare_uart::{
 //!     epd4in3::{EPD4in3, Display4in3},
 //!     graphics::{Display, DisplayRotation},
 //!     prelude::*,
@@ -27,7 +27,7 @@
 //! use embedded_graphics::Drawing;
 //!
 //! // Setup EPD
-//! let mut epd = EPD4in3::new(&mut uart, wake, rst, &mut delay).unwrap();
+//! let mut epd = EPD4in3::new(&mut serial, wake, rst, &mut delay).unwrap();
 //!
 //! // Use display graphics
 //! let mut display = Display4in3::default();
@@ -35,18 +35,18 @@
 //! // Write some hello world in the screenbuffer
 //! display.draw(
 //!     Font6x8::render_str("Hello World!")
-//!         .stroke(Some(Color::Black))
-//!         .fill(Some(Color::White))
-//!         .translate(Coord::new(5, 50))
+//!         .stroke(Some(EpdColor::Black))
+//!         .fill(Some(EpdColor::White))
+//!         .translate(Point::new(5, 50))
 //!         .into_iter(),
 //! );
 //!
 //! // Display updated frame
-//! epd.update_frame(&mut spi, &display.buffer()).unwrap();
-//! epd.display_frame(&mut spi).expect("display frame new graphics");
+//! epd.update_frame(&mut serial, &display.buffer()).unwrap();
+//! epd.display_frame(&mut serial).expect("display frame new graphics");
 //!
 //! // Set the EPD to sleep
-//! epd.sleep(&mut spi).expect("sleep");
+//! epd.sleep(&mut serial).expect("sleep");
 //! ```
 //!
 //!
@@ -55,18 +55,18 @@
 #[cfg(feature = "graphics")]
 pub mod graphics;
 
-mod traits;
-
 pub mod color;
-
 /// Interface for the physical connection between display and the controlling device
 mod interface;
+mod traits;
 
 #[cfg(feature = "epd4in3")]
 pub mod epd4in3;
+#[cfg(feature = "epd4in3")]
+pub use crate::epd4in3::command;
 
 pub mod prelude {
-    pub use crate::color::Color;
+    pub use crate::color::EpdColor;
     pub use crate::traits::WaveshareDisplay;
 
     #[cfg(feature = "graphics")]
