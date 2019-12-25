@@ -12,6 +12,12 @@ repository = "https://github.com/iohe/epd-waveshare-uart.git"
 version = "0.1.0"
 edition = "2018"
 
+[badges]
+travis-ci = { repository = "iohe/epd-waveshare-uart", branch = "master" }
+coveralls = { repository = "iohe/epd-waveshare-uart", branch = "master", service = "github" }
+maintenance = { status = "actively-developed" }
+
+
 [features]
 default = ["epd4in3", "graphics"]
 
